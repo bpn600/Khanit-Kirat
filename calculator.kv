@@ -1,0 +1,502 @@
+#:import dp kivy.metrics.dp
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDRectangleFlatButton kivymd.uix.button.MDRectangleFlatButton
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+
+<CalcNumButton@MDRectangleFlatButton>:
+    font_name: "assets/font/CODE2000.TTF"
+    font_size: '24sp'
+    size_hint: 1, 1
+    padding: [dp(5), dp(5)]
+    on_release: app.play_sound()
+    theme_text_color: "Custom"
+    text_color: 0, 0, 1, 1
+    border_style: "default"
+
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, 0)
+        Line:
+            width: 1
+            rounded_rectangle:
+                [self.x, self.y, self.width, self.height, \
+                20 if self.border_style == "rounded" else 0] \
+                if self.border_style in ["default", "rounded"] else \
+                [0, 0, 0, 0, 0]
+
+        Color:
+            rgba: (0, 0, 1, 1) if self.border_style == "blue" else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            rounded_rectangle:
+                [self.x, self.y, self.width, self.height, 10] \
+                if self.border_style == "blue" else \
+                [0, 0, 0, 0, 0]
+
+        Color:
+            rgba: (1, 0, 0, 1) if self.border_style == "red_dashed" else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            dash_length: dp(4)
+            dash_offset: dp(2)
+            rectangle:
+                [self.x, self.y, self.width, self.height] \
+                if self.border_style == "red_dashed" else \
+                [0, 0, 0, 0]
+
+        Color:
+            rgba: (0, 1, 0, 1) if self.border_style == "green_thick" else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            rounded_rectangle:
+                [self.x, self.y, self.width, self.height, 5] \
+                if self.border_style == "green_thick" else \
+                [0, 0, 0, 0, 0]
+
+<CalcCtrlButton@MDRectangleFlatButton>:
+    font_name: "assets/font/CODE2000.TTF"
+    font_size: '24sp'
+    size_hint: 1, 1
+    padding: [dp(5), dp(5)]
+    on_release: app.play_sound()
+    theme_text_color: "Custom"
+    text_color: 1, 0, 0, 1
+    border_style: "default"
+
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, 0)
+        Line:
+            width: 1
+            rounded_rectangle:
+                [self.x, self.y, self.width, self.height, \
+                20 if self.border_style == "rounded" else 0] \
+                if self.border_style in ["default", "rounded"] else \
+                [0, 0, 0, 0, 0]
+
+        Color:
+            rgba: (0, 0, 1, 1) if self.border_style == "blue" else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            rounded_rectangle:
+                [self.x, self.y, self.width, self.height, 10] \
+                if self.border_style == "blue" else \
+                [0, 0, 0, 0, 0]
+
+        Color:
+            rgba: (1, 0, 0, 1) if self.border_style == "red_dashed" else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            dash_length: dp(4)
+            dash_offset: dp(2)
+            rectangle:
+                [self.x, self.y, self.width, self.height] \
+                if self.border_style == "red_dashed" else \
+                [0, 0, 0, 0]
+
+        Color:
+            rgba: (0, 1, 0, 1) if self.border_style == "green_thick" else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            rounded_rectangle:
+                [self.x, self.y, self.width, self.height, 5] \
+                if self.border_style == "green_thick" else \
+                [0, 0, 0, 0, 0]
+
+<BottomIcons@MDIconButton>:
+    on_release: app.play_sound()
+    theme_text_color: "Custom"
+    icon_color: "white"
+
+ScreenManager:
+    id: sm
+
+    MainScreen:
+        name: 'main'
+    HelpScreen:
+        name: 'help_screen'
+    LogScreen:
+        name: 'log_screen'
+    KeyboardThemeStyle:
+        name: 'keyboard_theme_style'
+
+<MainScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: dp(8)
+        spacing: dp(15)
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.4
+            spacing: dp(10)
+
+            NoKeyboardTextInput:
+                id: input_text
+                text: root.current_input
+                hint_text: 'Enter Expression'
+                hint_text_color_normal: [0.3, 0.3, 0.3, 1]  # Dark gray
+                hint_text_color_focus: [0.3, 0.3, 0.3, 1]    # Same when focused
+                text_color: 0, 0, 1, 1
+                line_color_normal: [0.3, 0.3, 0.3, 0.5]      # Semi-transparent
+                line_color_focus: app.theme_cls.primary_color
+                font_name: root.font_name
+                #font_size: '24sp'
+                halign: 'right'
+                valign: 'bottom'
+                multiline: False
+                write_tab: False
+
+                cursor_color: 0, 0, 1, 1  # Blue cursor
+                cursor_blink: True  # Make cursor blink
+                cursor_width: '2sp'  # Make cursor slightly thicker
+
+                focus: True if root.focused_field == "input" else False
+                on_focus:
+                    if self.focus: root.set_focus("input")
+                on_text: root.current_input = self.text
+
+                # Enable horizontal scrolling
+                on_text:
+                    if len(self.text) * self.font_size > self.width: \
+                    self.scroll_x = (len(self.text) * self.font_size - self.width) / (len(self.text) * self.font_size)
+
+            NoKeyboardTextInput:
+                id: result_text
+                text: root.current_result
+                theme_text_color: "Custom"
+                #text_color: app.theme_cls.primary_color
+                text_color_normal: 0, 0, 1, 1
+                hint_text: 'Result'
+                hint_text_color_normal: [0.3, 0.3, 0.3, 1]  # Dark gray
+                hint_text_color_focus: [0.3, 0.3, 0.3, 1]    # Same when focused
+
+                line_color_normal: [0.3, 0.3, 0.3, 0.5]      # Semi-transparent
+                line_color_focus: app.theme_cls.primary_color
+                font_name: root.font_name
+                #font_size: '24sp'
+                multiline: False
+                halign: 'right'
+                valign: 'bottom'
+                readonly: True
+
+                cursor_color: 0, 0, 1, 1  # Blue cursor
+                cursor_blink: True  # Make cursor blink
+                cursor_width: '2sp'  # Make cursor slightly thicker
+
+                focus: True if root.focused_field == "result" else False
+                on_focus:
+                    if self.focus: root.set_focus("result")
+                readonly: True  # Result field should be read-only
+
+        MDGridLayout:
+            id: keypad
+            cols: 4
+            spacing: dp(5)
+            size_hint: 1, 0.65
+
+            CalcNumButton:
+                id: btn_0
+                text: "0" if root.current_num_system == "english" else "०" if root.current_num_system == "nepali" else "᥆"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcCtrlButton:
+                text: "AC"
+                on_release: root.on_button_press(self.text)
+
+            CalcCtrlButton:
+                text: "DEL"
+                on_release: root.on_button_press("DEL")
+
+            CalcCtrlButton:
+                text: '⌫'
+                on_release: root.on_button_press("⌫")
+
+            CalcNumButton:
+                id: btn_1
+                text: "1" if root.current_num_system == "english" else "१" if root.current_num_system == "nepali" else "᥇"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                id: btn_2
+                text: "2" if root.current_num_system == "english" else "२" if root.current_num_system == "nepali" else "᥈"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                id: btn_3
+                text: "3" if root.current_num_system == "english" else "३" if root.current_num_system == "nepali" else "᥉"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                text: "÷"
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+            CalcNumButton:
+                id: btn_4
+                text: "4" if root.current_num_system == "english" else "४" if root.current_num_system == "nepali" else "᥊"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                id: btn_5
+                text: "5" if root.current_num_system == "english" else "५" if root.current_num_system == "nepali" else "᥋"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                id: btn_6
+                text: "6" if root.current_num_system == "english" else "६" if root.current_num_system == "nepali" else "᥌"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                text: "×"
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+            CalcNumButton:
+                id: btn_7
+                text: "7" if root.current_num_system == "english" else "७" if root.current_num_system == "nepali" else "᥍"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                id: btn_8
+                text: "8" if root.current_num_system == "english" else "८" if root.current_num_system == "nepali" else "᥎"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                id: btn_9
+                text: "9" if root.current_num_system == "english" else "९" if root.current_num_system == "nepali" else "᥏"
+                on_release: root.on_button_press(self.text)
+                font_name: root.font_name
+
+            CalcNumButton:
+                text: "-"
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+            CalcNumButton:
+                text: "."
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+            CalcNumButton:
+                text: '%'
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+            CalcNumButton:
+                text: "+"
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+            CalcNumButton:
+                text: "="
+                on_release: root.on_button_press(self.text)
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.1
+            spacing: dp(10)
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+            CalcNumButton:
+                text: "᥇᥈᥉"
+                on_release: root.lim_num_press("LIM_NUM")
+                font_name: "assets/font/CODE2000.TTF"
+                font_size: '24sp'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+                size_hint: 1, 1
+
+            CalcNumButton:
+                text: "१२३"
+                on_release: root.nep_num_press("NEP_NUM")
+                font_name: "assets/font/CODE2000.TTF"
+                font_size: '24sp'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+                size_hint: 1, 1
+
+            CalcNumButton:
+                text: "123"
+                on_release: root.eng_num_press("ENG_NUM")
+                font_size: '24sp'
+                size_hint: 1, 1
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+
+        MDBoxLayout:
+            padding: "5dp"
+            spacing: dp(15)
+            size_hint: 1, 0.1
+            md_bg_color: app.theme_cls.primary_color
+
+    MDBoxLayout:
+        id: number_row
+        padding: "5dp"
+        spacing: dp(12)
+        size_hint: 1, 0.09
+        md_bg_color: app.theme_cls.primary_color
+
+        MDIconButton:
+            icon: 'delete-clock-outline'
+            size_hint: 1, 1
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            on_release: app.open_log()
+
+        MDIconButton:
+            icon: 'theme-light-dark'
+            size_hint: 1, 1
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            on_release: app.theme_changer()
+
+        MDIconButton:
+            icon: 'blank'
+
+        MDIconButton:
+            icon: 'help'
+            size_hint: 1, 1
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            on_release: app.open_help()
+
+        MDIconButton:
+            icon: 'dots-vertical'
+            size_hint: 1, 1
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            on_release: app.open_keyboard_theme()
+
+<KeyboardThemeStyle>:
+    name: 'keyboard_theme_style'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(5)
+        spacing: dp(5)
+
+        MDTopAppBar:
+            title: "Keyboard Border Style"
+            left_action_items: [["arrow-left", lambda x: app.return_to_HomeScreen()]]
+            elevation: 0
+
+        ScrollView:
+            GridLayout:
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(10)
+                padding: dp(10)
+
+                MDLabel:
+                    text: "Select Keyboard Border Style"
+                    font_style: "H6"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    halign: "center"
+
+                MDRectangleFlatButton:
+                    text: "Default Border"
+                    size_hint: 1, 1
+                    on_release:
+                        for btn in app.root.get_screen('main').ids.keypad.children: \
+                        btn.border_style = "default"
+                    line_color: app.theme_cls.primary_color
+
+                MDRectangleFlatButton:
+                    text: "Blue Border"
+                    size_hint: 1, 1
+                    on_release:
+                        for btn in app.root.get_screen('main').ids.keypad.children: \
+                        btn.border_style = "blue"
+                    line_color: (0, 0, 1, 1)
+
+                MDRectangleFlatButton:
+                    text: "Red Dashed Border"
+                    size_hint: 1, 1
+                    on_release:
+                        for btn in app.root.get_screen('main').ids.keypad.children: \
+                        btn.border_style = "red_dashed"
+                    line_color: (1, 0, 0, 1)
+
+                MDRectangleFlatButton:
+                    text: "Green Thick Border"
+                    size_hint: 1, 1
+                    on_release:
+                        for btn in app.root.get_screen('main').ids.keypad.children: \
+                        btn.border_style = "green_thick"
+                    line_color: (0, 1, 0, 1)
+
+                MDIconButton:
+                    icon: 'blank'
+
+                MDRaisedButton:
+                    text: "APPLY"
+                    size_hint: 1, 1
+                    on_release: app.return_to_HomeScreen()
+                    pos_hint: {"center_x": 0.5}
+                    md_bg_color: app.theme_cls.primary_color
+
+<HelpScreen>:
+    name: 'help_screen'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(5)
+        spacing: dp(5)
+        MDTopAppBar:
+            left_action_items: [["arrow-left", lambda x: app.return_to_HomeScreen()]]
+
+        ScrollView:
+            id: scroll_view
+            MDLabel:
+                id: help_label
+                text: "[b]Learn Numbers:[/b]\n— — — — — — — — — — — — \nKirat   |     Nepali    |     English\n  ᥆      |        ०      |       0\n  ᥇      |        १      |       1\n  ᥈      |        २      |       2\n  ᥉      |        ३      |       3\n  ᥊      |        ४      |       4\n  ᥋      |        ५      |       5\n  ᥌      |        ६      |       6\n  ᥍      |        ७      |       7\n  ᥎      |        ८      |       8\n  ᥏      |        ९      |       9"
+                size_hint_y: None
+                height: self.texture_size[1]
+                text_size: self.width, None
+                padding: 10, 10
+                font_name: "assets/font/CODE2000.TTF"
+                markup: True
+                md_bg_color: self.theme_cls.primary_light
+
+<LogScreen>:
+    name: 'log_screen'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(5)
+        spacing: dp(5)
+        MDTopAppBar:
+            title: "Calculation History"
+            left_action_items: [["arrow-left", lambda x: app.return_to_HomeScreen()]]
+            elevation: 0
+
+        ScrollView:
+            MDLabel:
+                id: log_label
+                text: 'Loading history...'
+                size_hint_y: None
+                height: self.texture_size[1]
+                text_size: self.width - dp(20), None
+                padding: dp(10), dp(10)
+                font_name: "assets/font/CODE2000.TTF"
+                theme_text_color: "Custom"
+                text_color: 0.5, 0.5, 1, 1
+                markup: True
+                on_ref_press: root.on_ref_press(args[1])
