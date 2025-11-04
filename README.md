@@ -1,2 +1,2 @@
 # Khanit-Kirat
-khani kirat is calculater 
+khani kirat is a calculater with three languages.
